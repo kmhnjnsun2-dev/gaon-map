@@ -70,14 +70,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    async function hashPassword(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    const ADMIN_PASSWORD_HASH = "011c97e70e439eb14187e076610ed8876c029ddb53c12a7bf89d023b8f2d508e";
+    // 비밀번호 "1111"의 Base64 인코딩 값
+    const ENCODED_PASS = "TVRFEE1RPT0=";
 
     async function loadPost() {
         if (!postId) {
@@ -109,9 +103,8 @@
         const inputPassword = prompt("관리자 비밀번호를 입력하세요:");
         if (!inputPassword) return;
 
-        const hashedInput = await hashPassword(inputPassword.trim());
-
-        if (hashedInput === ADMIN_PASSWORD_HASH) {
+        // 입력받은 비밀번호를 Base64로 인코딩하여 비교
+        if (btoa(inputPassword.trim()) === ENCODED_PASS) {
             if (confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
                 try {
                     await deleteDoc(doc(db, "posts", postId));
