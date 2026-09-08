@@ -70,10 +70,21 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
+    // SHA-256 해시 변환 함수
+    async function hashPassword(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // "1111"의 SHA-256 해시 값
+    const ADMIN_PASSWORD_HASH = "011c97e70e439eb14187e076610ed8876c029ddb53c12a7bf89d023b8f2d508e";
+
     async function loadPost() {
         if (!postId) {
             alert('잘못된 접근입니다.');
-            location.href = 'map.html';
+            location.href = 'index.html';
             return;
         }
 
@@ -88,7 +99,7 @@
             document.getElementById('postContent').innerText = currentPost.detail;
         } else {
             alert('존재하지 않는 게시물입니다.');
-            location.href = 'map.html';
+            location.href = 'index.html';
         }
     }
 
@@ -96,7 +107,10 @@
         const inputPassword = prompt("관리자 비밀번호를 입력하세요:");
         if (!inputPassword) return;
 
-        if (inputPassword.trim() === "1111") {
+        // 입력한 비밀번호를 해시값으로 변환하여 비교
+        const hashedInput = await hashPassword(inputPassword.trim());
+
+        if (hashedInput === ADMIN_PASSWORD_HASH) {
             if (confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
                 try {
                     await deleteDoc(doc(db, "posts", postId));
