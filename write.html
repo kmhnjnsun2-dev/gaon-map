@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>글쓰기</title>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }
+    table { margin: auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input[type="text"], textarea {
+        border: 1.5px rgb(68, 136, 244) solid;
+        width: 500px;
+        border-radius: 5px;
+        padding: 8px 10px;
+        box-sizing: border-box;
+    }
+    input[type="text"] { height: 35px; }
+    textarea { height: 300px; resize: none; }
+    .header { height: 30px; font-weight: bold; }
+    input[type="submit"], input[type="button"] {
+        width: 100px;
+        height: 35px;
+        font-size: 14px;
+        border: 0;
+        outline: 1.5px rgb(68, 136, 244) solid;
+        border-radius: 5px;
+        background-color: rgb(164, 199, 255);
+        cursor: pointer;
+        margin-right: 5px;
+    }
+</style>
+</head>
+<body>
+
+<form id="writeForm">
+<table> 
+    <tr><td colspan="2"><h2>글쓰기</h2></td></tr>
+    <tr><td class="header">Title</td></tr>
+    <tr><td><input type="text" id="title" placeholder="제목을 입력하세요" required></td></tr>
+    <tr><td class="header">Author</td></tr>
+    <tr><td><input type="text" id="author" placeholder="작성자 이름을 입력하세요" required></td></tr>
+    <tr><td class="header">Comment</td></tr>
+    <tr><td><textarea id="detail" placeholder="내용을 입력하세요" required></textarea></td></tr>
+    <tr>
+        <td style="padding-top: 15px;">
+            <input type="submit" value="등록">
+            <input type="button" value="취소" onclick="location.href='map.html'">
+        </td>
+    </tr>
+</table>
+</form>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVbp-_5KdDynXCSqgC6Fes2EmpjKTD2Mk",
+        authDomain: "gaon-map-db.firebaseapp.com",
+        projectId: "gaon-map-db",
+        storageBucket: "gaon-map-db.firebasestorage.app",
+        messagingSenderId: "433762115709",
+        appId: "1:433762115709:web:0f931e8828614b1ca5d114",
+        measurementId: "G-0WT6P1M3ST"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('writeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const title = document.getElementById('title').value;
+        const author = document.getElementById('author').value;
+        const detail = document.getElementById('detail').value;
+        
+        const today = new Date();
+        const dateStr = String(today.getFullYear()).slice(-2) + '-' + 
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(today.getDate()).padStart(2, '0');
+
+        try {
+            await addDoc(collection(db, "posts"), {
+                title: title,
+                author: author,
+                detail: detail,
+                date: dateStr,
+                createdAt: serverTimestamp()
+            });
+
+            alert('작성 완료!');
+            location.href = 'map.html';
+        } catch (error) {
+            console.error("글 저장 실패:", error);
+            alert('글 저장에 실패했습니다.');
+        }
+    });
+</script>
+
+</body>
+</html>

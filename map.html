@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 가온고 교실 배치도</title>
+    <link rel="stylesheet" href="map.css">
+</head>
+
+<body>
+
+    <!-- 제목 -->
+    <div class="title">
+        <h1>2026 가온고 교실 배치도</h1>
+        <hr>
+    </div>
+
+    <!-- 층 선택 -->
+    <div class="floor-buttons">
+        <button onclick="showFloor(1)">1층</button>
+        <button onclick="showFloor(2)">2층</button>
+        <button onclick="showFloor(3)">3층</button>
+        <button onclick="showFloor(4)">4층</button>
+    </div>
+
+    <!-- 1층 지도 -->
+    <div class="map floor1">
+        <div class="fixed-room library"><div>도서관</div></div>
+        <div class="fixed-room bigdata-room"><div>빅데이터<br>교실</div></div>
+        <div class="fixed-room weeclass"><div>위클래스</div></div>
+        <div class="fixed-room hospital"><div>보건실</div></div>
+        <div class="fixed-room counseling-room"><div>진로진학<br>상담실</div></div>
+        <div class="fixed-room toilet"><div>화장실</div></div>
+        <div class="fixed-room left-stair"><div>좌측<br>계단</div></div>
+        <div class="fixed-room lobby"><div>로비</div></div>
+            
+        <div class="fixed-room central-corridor"><div>중앙복도</div></div>
+        <div class="fixed-room left-corridor"><div>좌측복도</div></div>
+        <div class="fixed-room robot-room"><div>로봇중점교실</div></div>
+        <div class="fixed-room teacher-document-office"><div>교무자료실</div></div>
+        <div class="fixed-room conference-room"><div>컨퍼런스실</div></div>
+        <div class="fixed-room principal-office"><div>교장실</div></div>
+        <div class="fixed-room bio-education-room"><div>환경교육부</div></div>
+        <div class="fixed-room overnight-room"><div>숙직실</div></div>
+        <div class="fixed-room printing-room"><div>인쇄실</div></div>
+
+        <div class="fixed-room administration-office"><div>행정실</div></div>
+        <div class="fixed-room chairman-office"><div>이사장실</div></div>
+        <div class="fixed-room substation-room"><div>변전실</div></div>
+        <div class="fixed-room central-stair"><div>중앙<br>계단</div></div>
+        <div class="fixed-room right-toilet"><div>우측<br>화장실</div></div>
+        <div class="fixed-room right-stair"><div>우측<br>계단</div></div>
+        <div class="fixed-room cafe"><div>카페</div></div>
+    
+        <div class="outdoor-class">    
+            <div class="fixed-room playground"><div>운동장</div></div>
+            <div class="fixed-room minerva"><div>미네<br>르바</div></div>
+            <div class="fixed-room mongjakso"><div>몽작소</div></div>
+            <div class="fixed-room harmonia"><div>하모<br>니아</div></div>
+        </div>
+    </div>
+
+    <!-- 2층 지도 -->
+    <div class="map floor2">
+        <div class="fixed-room music-room"><div>음악실</div></div>
+        <div class="fixed-room secondfloor-lobby"><div>로비</div></div>
+        <div class="fixed-room secondfloor-left-stair"><div>좌측<br>계단</div></div>
+        <div class="fixed-room secondfloor-left-teacher-office"><div>제2교무실</div></div>
+        <div class="fixed-room secondfloor-left-toilet"><div>화장실</div></div>
+        <div class="fixed-room secondfloor-fittingroom"><div>탈의실</div></div>
+        <div class="fixed-room secondfloor-headteacher-office"><div>교감실</div></div>
+        <div class="fixed-room secondfloor-center-teacher-office"><div>제1교무실</div></div>
+        <div class="fixed-room secondfloor-central-stair"><div>중앙<br>계단</div></div>
+        <div class="fixed-room secondfloor-right-toilet"><div>화장실</div></div>
+        <div class="fixed-room secondfloor-right-stair"><div>우측<br>계단</div></div>
+        <div class="fixed-room broadcasting-room"><div>방송실</div></div>
+        <div class="fixed-room secondfloor-central-corridor"><div>중앙복도</div></div>
+        <div class="fixed-room secondfloor-left-corridor"><div>좌측 복도</div></div>
+
+        <div class="class-room class106">1-6</div>
+        <div class="class-room class105">1-5</div>
+        <div class="class-room class107">1-7</div>
+        <div class="class-room class108">1-8</div>
+    </div>
+
+    <!-- 3층 지도 -->
+    <div class="map floor3">
+        <div class="class-room class301">3-1</div>
+        <div class="class-room class302">3-2</div>
+        <div class="class-room class303">3-3</div>
+    </div>
+
+    <!-- 4층 지도 -->
+    <div class="map floor4"></div>
+
+    <!-- 기존 지도 동작 스크립트 -->
+    <script src="map.js"></script>
+
+    <!-- 게시판 영역 -->
+    <div class="board-container">
+        <h2>게시판</h2>
+        <table class="table" id="boardTable">
+            <thead>
+                <tr class="header">
+                    <th class="num">번호</th>
+                    <th class="board-title">제목</th>
+                    <th class="author">작성자</th>
+                    <th class="date">작성날짜</th>
+                </tr>
+            </thead>
+            <tbody id="boardBody">
+            </tbody>
+        </table>
+
+        <div class="button-area">
+            <button onclick="location.href='write.html'">글쓰기</button>
+        </div>
+    </div>
+
+    <!-- Firebase 데이터베이스 연동 스크립트 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVbp-_5KdDynXCSqgC6Fes2EmpjKTD2Mk",
+            authDomain: "gaon-map-db.firebaseapp.com",
+            projectId: "gaon-map-db",
+            storageBucket: "gaon-map-db.firebasestorage.app",
+            messagingSenderId: "433762115709",
+            appId: "1:433762115709:web:0f931e8828614b1ca5d114",
+            measurementId: "G-0WT6P1M3ST"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadBoard() {
+            const boardBody = document.getElementById('boardBody');
+            if (!boardBody) return;
+            boardBody.innerHTML = '';
+
+            try {
+                const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    boardBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 15px;">등록된 게시물이 없습니다.</td></tr>`;
+                    return;
+                }
+
+                let totalCount = querySnapshot.size;
+                let index = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const post = doc.data();
+                    const row = document.createElement('tr');
+                    row.className = 'body';
+                    row.innerHTML = `
+                        <td class="num">${totalCount - index}</td>
+                        <td class="board-title"><a href="detail.html?id=${doc.id}">${post.title}</a></td>
+                        <td class="author">${post.author}</td>
+                        <td class="date">${post.date}</td>
+                    `;
+                    boardBody.appendChild(row);
+                    index++;
+                });
+            } catch (error) {
+                console.error("데이터 불러오기 실패:", error);
+            }
+        }
+
+        window.onload = function() {
+            if (typeof showFloor === 'function') {
+                showFloor(1);
+            }
+            loadBoard();
+        };
+    </script>
+</body>
+</html>
