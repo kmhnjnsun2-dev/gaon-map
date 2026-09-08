@@ -46,7 +46,7 @@
 
     <div class="btn-area">
         <button class="delete-btn" id="deleteBtn">삭제하기</button>
-        <button onclick="location.href='map.html'">목록으로</button>
+        <button onclick="location.href='index.html'">목록으로</button>
     </div>
 </div>
 
@@ -101,7 +101,7 @@
                 try {
                     await deleteDoc(doc(db, "posts", postId));
                     alert('게시글이 삭제되었습니다.');
-                    location.href = 'map.html';
+                    location.href = 'index.html';
                 } catch (error) {
                     console.error("삭제 실패:", error);
                     alert('게시글 삭제에 실패했습니다.');
