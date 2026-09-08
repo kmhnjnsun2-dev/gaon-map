@@ -38,11 +38,11 @@
 <body>
 
 <div class="container">
-    <h2 id="postTitle">제목</h2>
+    <h2 id="postTitle">제목 불러오는 중...</h2>
     <div class="info">
-        작성자: <span id="postAuthor"></span> | 작성일: <span id="postDate"></span>
+        작성자: <span id="postAuthor">-</span> | 작성일: <span id="postDate">-</span>
     </div>
-    <div class="content" id="postContent">내용</div>
+    <div class="content" id="postContent">내용을 불러오는 중입니다...</div>
 
     <div class="btn-area">
         <button class="delete-btn" id="deleteBtn">삭제하기</button>
@@ -70,7 +70,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    // SHA-256 해시 변환 함수
     async function hashPassword(message) {
         const msgBuffer = new TextEncoder().encode(message);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -78,7 +77,6 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // "1111"의 SHA-256 해시 값
     const ADMIN_PASSWORD_HASH = "011c97e70e439eb14187e076610ed8876c029ddb53c12a7bf89d023b8f2d508e";
 
     async function loadPost() {
@@ -88,18 +86,22 @@
             return;
         }
 
-        const docRef = doc(db, "posts", postId);
-        const docSnap = await getDoc(docRef);
+        try {
+            const docRef = doc(db, "posts", postId);
+            const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            const currentPost = docSnap.data();
-            document.getElementById('postTitle').innerText = currentPost.title;
-            document.getElementById('postAuthor').innerText = currentPost.author;
-            document.getElementById('postDate').innerText = currentPost.date;
-            document.getElementById('postContent').innerText = currentPost.detail;
-        } else {
-            alert('존재하지 않는 게시물입니다.');
-            location.href = 'index.html';
+            if (docSnap.exists()) {
+                const currentPost = docSnap.data();
+                document.getElementById('postTitle').innerText = currentPost.title;
+                document.getElementById('postAuthor').innerText = currentPost.author;
+                document.getElementById('postDate').innerText = currentPost.date;
+                document.getElementById('postContent').innerText = currentPost.detail;
+            } else {
+                alert('존재하지 않는 게시물입니다.');
+                location.href = 'index.html';
+            }
+        } catch (error) {
+            console.error("데이터 로드 실패:", error);
         }
     }
 
@@ -107,7 +109,6 @@
         const inputPassword = prompt("관리자 비밀번호를 입력하세요:");
         if (!inputPassword) return;
 
-        // 입력한 비밀번호를 해시값으로 변환하여 비교
         const hashedInput = await hashPassword(inputPassword.trim());
 
         if (hashedInput === ADMIN_PASSWORD_HASH) {
@@ -126,8 +127,13 @@
         }
     }
 
-    document.getElementById('deleteBtn').addEventListener('click', deletePost);
-    window.onload = loadPost;
+    window.addEventListener('DOMContentLoaded', () => {
+        loadPost();
+        const deleteBtn = document.getElementById('deleteBtn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', deletePost);
+        }
+    });
 </script>
 
 </body>
