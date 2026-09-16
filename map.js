@@ -415,6 +415,16 @@ const facilityNames = {
 
     "cafe": "카페 이랑",
 
+    "secondfloor-left-stair": "좌측 계단",
+
+    "music-room": "음악실",
+
+    "secondfloor-lobby": "로비",
+
+    "secondfloor-left-teacher-office": "제2교무실",
+
+    "secondfloor-left-toilet": "화장실"
+
 };
 
 

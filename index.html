@@ -82,13 +82,46 @@
         <div class="class-room class105">1-5</div>
         <div class="class-room class107">1-7</div>
         <div class="class-room class108">1-8</div>
+
+        <div class="class-room class301">3-1</div>
+        <div class="class-room class302">3-2</div>
+        <div class="class-room class303">3-3</div>
+        <div class="class-room class304">3-4</div>
+        <div class="class-room class305">3-5</div>
+
     </div>
 
     <!-- 3층 지도 -->
     <div class="map floor3">
-        <div class="class-room class301">3-1</div>
-        <div class="class-room class302">3-2</div>
-        <div class="class-room class303">3-3</div>
+        <div class="fixed-room semina-room"><div>세미나실</div></div>
+        <div class="fixed-room thirdfloor-lobby"><div>로비</div></div>
+        <div class="fixed-room thirdfloor-stair"><div>좌측<br>계단</div></div>
+        <div class="fixed-room thirdfloor-left-teacher-office"><div>1학년<br>교무실</div></div>
+        <div class="fixed-room thirdfloor-left-toilet"><div>화장실</div></div>
+        <div class="fixed-room thirdfloor-damokjeoksil"><div>다목적실</div></div>
+        <div class="fixed-room thirdfloor-homebase"><div>홈베이스</div></div>
+        <div class="fixed-room thirdfloor-center-teacher-office"><div>진로,IB교육과정부<br>교무실</div></div>
+        <div class="fixed-room thirdfloor-central-stair"><div>중앙<br>계단</div></div>
+        <div class="fixed-room thirdfloor-right-toilet"><div>화장실</div></div>
+        <div class="fixed-room thirdfloor-right-stair"><div>우측<br>계단</div></div>
+        <div class="fixed-room thirdfloor-small-classroom1"><div>소강의실1</div></div>
+        <div class="fixed-room thirdfloor-small-classroom2"><div>소강의실2</div></div>
+        <div class="fixed-room thirdfloor-central-corridor"><div>중앙복도</div></div>
+        <div class="fixed-room thirdfloor-left-corridor"><div>좌측 복도</div></div>
+        <div class="fixed-room thirdfloor-teaching-analyze-room"><div>수업분석실</div></div>
+        <div class="fixed-room thirdfloor-student-debate-room"><div>학생회의실</div></div>
+        <div class="fixed-room thirdfloor-science-room2"><div>과학탐구실험2실</div></div>
+        <div class="fixed-room thirdfloor-science-room3"><div>과학탐구실험3실</div></div>
+        <div class="fixed-room thirdfloor-preparing-room"><div>준비실</div></div>
+
+        
+        <div class="class-room class101">1-3</div>
+        <div class="class-room class102">1-2</div>
+        <div class="class-room class103">1-1</div>
+        <div class="class-room class104">1-4</div>
+
+        <div class="class-room class207">2-7</div>
+        <div class="class-room class208">2-8</div>
     </div>
 
     <!-- 4층 지도 -->
@@ -120,20 +153,11 @@
 
     <!-- Firebase 데이터베이스 연동 스크립트 -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAVbp-_5KdDynXCSqgC6Fes2EmpjKTD2Mk",
-            authDomain: "gaon-map-db.firebaseapp.com",
-            projectId: "gaon-map-db",
-            storageBucket: "gaon-map-db.firebasestorage.app",
-            messagingSenderId: "433762115709",
-            appId: "1:433762115709:web:0f931e8828614b1ca5d114",
-            measurementId: "G-0WT6P1M3ST"
-        };
-
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         async function loadBoard() {

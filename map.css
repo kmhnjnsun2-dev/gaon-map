@@ -583,7 +583,7 @@ body {
     top: 60%;
 
 
-    width: 15.1%;
+    width: 13%;
     height: 18%;
 }
 
@@ -593,7 +593,7 @@ body {
 /* ===================================================== */
 
 .secondfloor-central-stair {
-    left: 52.6%;
+    left: 50.5%;
     top: 60%;
 
 
@@ -602,11 +602,11 @@ body {
 }
 
 .secondfloor-right-toilet {
-    left: 88.1%;
+    left: 88.5%;
     top: 60%;
 
 
-    width: 4%;
+    width: 3.5%;
     height: 18%;
 }
 
@@ -656,34 +656,151 @@ body {
     height: 16%;
 }
 
+.class301 {
+    left: 57.7%;
+    top: 60%;
+
+    width: 6%;
+    height: 18%;
+}
+.class302{
+    left: 63.9%;
+    top: 60%;
+
+    width: 6%;
+    height: 18%;
+}
+.class303 {
+    left: 70.1%;
+    top: 60%;
+
+    width: 6%;
+    height: 18%;
+}
+
+.class304 {
+    left: 76.2%;
+    top: 60%;
+
+    width: 6%;
+    height: 18%;
+}
+
+.class305 {
+    left: 82.3%;
+    top: 60%;
+
+    width: 6%;
+    height: 18%;
+}
 
 /* ===================================================== */
 /* ==================== 3층 ============================= */
 /* ===================================================== */
 
-.class301 {
-    left: 10%;
-    top: 20%;
+.class103 {
+    left: 1%;
+    top: 10%;
 
-    width: 10%;
-    height: 20%;
+    width: 9%;
+    height: 16%;
 }
 
-.class302 {
-    left: 22%;
-    top: 20%;
+.class102 {
+    left: 1%;
+    top: 27.5%;
 
-    width: 10%;
-    height: 20%;
+    width: 9%;
+    height: 16%;
 }
 
-.class303 {
-    left: 34%;
-    top: 20%;
+.class104 {
+    left: 12%;
+    top: 10%;
 
-    width: 10%;
-    height: 20%;
+    width: 9%;
+    height: 16%;
 }
+
+.semina-room {
+    left: 96.5%;
+    top: 57.5%;
+
+    width: 2.5%;
+    height: 30%;
+}
+
+/* 3층로비 */
+.thirdfloor-lobby {
+    left: 12%;
+    top: 60%;
+
+
+    width: 9%;
+    height: 18%;
+}
+
+/* 3층 좌측 계단 */
+.thirdfloor-left-stair {
+    left: 6%;
+    top: 60%;
+
+
+    width: 4%;
+    height: 18%;
+}
+
+/* 중앙 복도 */
+.thirdfloor-central-corridor {
+    left: 1%;
+    top: 78.5%;
+
+    width: 95.2%;
+    height: 5%;
+}
+
+
+/* 왼쪽 복도 */
+.thirdfloor-left-corridor {
+    left: 10.25%;
+    top: 10%;
+
+    width: 1.5%;
+    height: 68%;
+}
+
+
+
+/* 좌측교무실 */
+.thirdfloor-left-teacher-office {
+    left: 12%;
+    top: 45%;
+
+
+    width: 9%;
+    height: 14.5%;
+}
+
+/* 화장실 */
+.thirdfloor-left-toilet {
+    left: 1%;
+    top: 60%;
+
+
+    width: 4.5%;
+    height: 18%;
+}
+
+/* 홈베이스 */
+.thirdfloor-homebase{
+    left: 21.15%;
+    top: 60%;
+
+
+    width: 12%;
+    height: 18%;
+}
+
 
 
 /* ===================================================== */

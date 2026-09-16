@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 방문 기록은 Cloud Function(Admin SDK)만 저장·조회합니다.
+    match /visitorLogs/{logId} {
+      allow read, write: if false;
+    }
+
+    // 게시판의 기존 사용 방식(로그인 없이 읽기/쓰기)을 유지합니다.
+    match /posts/{postId} {
+      allow read, write: if true;
+    }
+  }
+}

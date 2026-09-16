@@ -51,20 +51,11 @@
 </form>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { firebaseConfig } from "./firebase-config.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAVbp-_5KdDynXCSqgC6Fes2EmpjKTD2Mk",
-        authDomain: "gaon-map-db.firebaseapp.com",
-        projectId: "gaon-map-db",
-        storageBucket: "gaon-map-db.firebasestorage.app",
-        messagingSenderId: "433762115709",
-        appId: "1:433762115709:web:0f931e8828614b1ca5d114",
-        measurementId: "G-0WT6P1M3ST"
-    };
-
-    const app = initializeApp(firebaseConfig);
+    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     document.getElementById('writeForm').addEventListener('submit', async function(e) {
@@ -80,11 +71,22 @@
                         String(today.getDate()).padStart(2, '0');
 
         try {
+            const ipResponse = await fetch("https://api.ipify.org?format=json");
+            if (!ipResponse.ok) {
+                throw new Error(`IP 조회 실패: HTTP ${ipResponse.status}`);
+            }
+
+            const ipData = await ipResponse.json();
+            if (typeof ipData.ip !== "string" || ipData.ip.trim() === "") {
+                throw new Error("IP 조회 응답이 올바르지 않습니다.");
+            }
+
             await addDoc(collection(db, "posts"), {
                 title: title,
                 author: author,
                 detail: detail,
                 date: dateStr,
+                ip: ipData.ip.trim(),
                 createdAt: serverTimestamp()
             });
 
