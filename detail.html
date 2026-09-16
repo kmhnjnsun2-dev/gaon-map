@@ -52,7 +52,7 @@
 
 <script type="module">
     import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { firebaseConfig } from "./firebase-config.js";
 
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
@@ -60,9 +60,6 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
-
-    // 비밀번호 "1111"의 Base64 인코딩 값
-    const ENCODED_PASS = "TVRFEE1RPT0=";
 
     async function loadPost() {
         if (!postId) {
@@ -90,25 +87,8 @@
         }
     }
 
-    async function deletePost() {
-        const inputPassword = prompt("관리자 비밀번호를 입력하세요:");
-        if (!inputPassword) return;
-
-        // 입력받은 비밀번호를 Base64로 인코딩하여 비교
-        if (btoa(inputPassword.trim()) === ENCODED_PASS) {
-            if (confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
-                try {
-                    await deleteDoc(doc(db, "posts", postId));
-                    alert('게시글이 삭제되었습니다.');
-                    location.href = 'index.html';
-                } catch (error) {
-                    console.error("삭제 실패:", error);
-                    alert('게시글 삭제에 실패했습니다.');
-                }
-            }
-        } else {
-            alert('비밀번호가 일치하지 않습니다.');
-        }
+    function deletePost() {
+        alert("게시글 삭제 기능은 현재 관리자 페이지/콘솔을 통해서만 지원됩니다.");
     }
 
     window.addEventListener('DOMContentLoaded', () => {

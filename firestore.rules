@@ -2,14 +2,16 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 방문 기록은 Cloud Function(Admin SDK)만 저장·조회합니다.
+    // 방문 기록은 Cloud Function(Admin SDK)만 저장·조회
     match /visitorLogs/{logId} {
       allow read, write: if false;
     }
 
-    // 게시판의 기존 사용 방식(로그인 없이 읽기/쓰기)을 유지합니다.
+    // 게시판: 일반 사용자는 읽기와 신규 작성만 가능, 수정 및 삭제 금지
     match /posts/{postId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false;
     }
   }
 }
