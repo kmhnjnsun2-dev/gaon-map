@@ -81,6 +81,10 @@
             margin-top: 15px;
         }
 
+        [hidden] {
+            display: none !important;
+        }
+
         @media (max-width: 600px) {
             .container {
                 margin: 10px auto;
@@ -108,20 +112,17 @@
 
     <div class="btn-area">
 
-        <!-- 관리자에게만 표시 -->
         <button
             class="delete-btn"
             id="deleteBtn"
+            type="button"
             hidden
             disabled
         >
             삭제하기
         </button>
 
-        <button
-            id="listBtn"
-            type="button"
-        >
+        <button id="listBtn" type="button">
             목록으로
         </button>
 
@@ -142,7 +143,8 @@
 
     import {
         getAuth,
-        onAuthStateChanged
+        onAuthStateChanged,
+        reload
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     import {
@@ -170,7 +172,7 @@
     const ADMIN_UID = "nFEHK0hHcngxC6kEiXVywxFiYPr2";
 
 
-    // 게시글 ID 가져오기
+    // 게시글 ID
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get("id");
 
@@ -186,7 +188,6 @@
     const statusMessage = document.getElementById("statusMessage");
 
 
-    // 게시글 참조
     let postRef = null;
 
 
@@ -200,11 +201,9 @@
     async function loadPost() {
 
         if (!postId || postId.trim() === "") {
-
             alert("잘못된 접근입니다.");
             location.href = "index.html";
             return;
-
         }
 
         try {
@@ -223,7 +222,7 @@
 
             const currentPost = docSnap.data();
 
-            // 모든 게시글 데이터는 텍스트로 출력
+            // 사용자 입력 데이터는 HTML이 아닌 텍스트로 출력
             postTitle.textContent = String(currentPost.title ?? "");
             postAuthor.textContent = String(currentPost.author ?? "");
             postDate.textContent = String(currentPost.date ?? "");
@@ -238,22 +237,40 @@
                 "데이터를 불러오는 중 오류가 발생했습니다.";
 
             statusMessage.textContent =
-                "Firebase 데이터베이스 권한과 연결 상태를 확인해 주세요.";
+                "Firebase 연결 및 권한 설정을 확인해 주세요.";
 
         }
 
     }
 
 
-    // 로그인 상태에 따른 관리자 버튼 표시
-    onAuthStateChanged(auth, (user) => {
+    // 관리자 여부 확인
+    onAuthStateChanged(auth, async (user) => {
 
-        const isAdmin = Boolean(
-            user && user.uid === ADMIN_UID
-        );
+        deleteBtn.hidden = true;
+        deleteBtn.disabled = true;
 
-        deleteBtn.hidden = !isAdmin;
-        deleteBtn.disabled = !isAdmin;
+        if (!user) return;
+
+        try {
+
+            await reload(user);
+            await user.getIdToken(true);
+
+            const isAdmin =
+                user.uid === ADMIN_UID &&
+                user.emailVerified === true;
+
+            if (isAdmin) {
+                deleteBtn.hidden = false;
+                deleteBtn.disabled = false;
+            }
+
+        } catch (error) {
+
+            console.error("관리자 확인 실패:", error);
+
+        }
 
     });
 
@@ -263,37 +280,41 @@
 
         const user = auth.currentUser;
 
-        // 관리자 UID 재확인
-        if (!user || user.uid !== ADMIN_UID) {
-
-            alert("관리자만 게시글을 삭제할 수 있습니다.");
+        if (!user) {
+            alert("관리자 로그인이 필요합니다.");
             return;
-
         }
-
-        if (!postRef) {
-
-            alert("게시글 정보가 아직 준비되지 않았습니다.");
-            return;
-
-        }
-
-        const confirmed = confirm(
-            "정말 이 게시글을 삭제하시겠습니까?\n삭제한 게시글은 복구할 수 없습니다."
-        );
-
-        if (!confirmed) return;
-
-        deleteBtn.disabled = true;
-        statusMessage.textContent = "게시글 삭제 중...";
 
         try {
 
-            // Firestore에서 게시글 삭제
+            await reload(user);
+            await user.getIdToken(true);
+
+            if (
+                user.uid !== ADMIN_UID ||
+                user.emailVerified !== true
+            ) {
+                alert("관리자만 게시글을 삭제할 수 있습니다.");
+                return;
+            }
+
+            if (!postRef) {
+                alert("게시글 정보가 아직 준비되지 않았습니다.");
+                return;
+            }
+
+            const confirmed = confirm(
+                "정말 이 게시글을 삭제하시겠습니까?\n삭제한 게시글은 복구할 수 없습니다."
+            );
+
+            if (!confirmed) return;
+
+            deleteBtn.disabled = true;
+            statusMessage.textContent = "게시글 삭제 중...";
+
             await deleteDoc(postRef);
 
             alert("게시글이 삭제되었습니다.");
-
             location.href = "index.html";
 
         } catch (error) {
@@ -310,7 +331,6 @@
     }
 
 
-    // 삭제 버튼 이벤트
     deleteBtn.addEventListener("click", deletePost);
 
 
