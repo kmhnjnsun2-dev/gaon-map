@@ -1,23 +1,25 @@
 
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>글쓰기</title>
+    <title>게시판 글쓰기</title>
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background: #f0f0f0;
             margin: 0;
             padding: 20px;
         }
 
-        table {
-            margin: auto;
-            background-color: white;
+        .panel, table {
+            width: 600px;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 30px auto;
+            background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -27,257 +29,201 @@
         input[type="email"],
         input[type="password"],
         textarea {
-            border: 1.5px rgb(68, 136, 244) solid;
-            width: 500px;
-            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1.5px solid rgb(68, 136, 244);
             border-radius: 5px;
             padding: 8px 10px;
-            box-sizing: border-box;
+            margin: 5px 0 12px;
+            font-size: 14px;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
-            height: 35px;
+            height: 38px;
         }
 
         textarea {
-            height: 300px;
+            height: 250px;
             resize: vertical;
         }
 
-        .header {
-            height: 30px;
-            font-weight: bold;
-        }
-
-        input[type="submit"],
-        input[type="button"],
-        button {
+        button, input[type="submit"] {
             min-width: 100px;
-            height: 35px;
-            font-size: 14px;
-            border: 0;
-            outline: 1.5px rgb(68, 136, 244) solid;
-            border-radius: 5px;
-            background-color: rgb(164, 199, 255);
-            cursor: pointer;
-            margin-right: 5px;
+            height: 38px;
             padding: 0 12px;
+            margin: 5px;
+            border: 0;
+            outline: 1.5px solid rgb(68, 136, 244);
+            border-radius: 5px;
+            background: rgb(164, 199, 255);
+            cursor: pointer;
         }
 
-        button:disabled,
-        input[type="submit"]:disabled {
+        button:disabled, input:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
+        h2 { margin-top: 0; }
+
         .message {
             text-align: center;
-            margin: 15px;
-            color: #333;
+            white-space: pre-wrap;
+            line-height: 1.5;
         }
 
-        .error {
-            color: #d32f2f;
-        }
+        .error { color: #d32f2f; }
+        .success { color: #16803c; }
+        .center { text-align: center; }
 
-        .success {
-            color: #16803c;
-        }
-
-        .panel {
-            text-align: center;
-        }
-
-        .logout-area {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        @media (max-width: 600px) {
-            table {
-                width: 100%;
-                padding: 12px;
-            }
-
-            input[type="text"],
-            input[type="email"],
-            input[type="password"],
-            textarea {
-                width: 100%;
-            }
+        [hidden] {
+            display: none !important;
         }
     </style>
 </head>
 
 <body>
 
-<!-- 로그인 화면 -->
-<div id="loginPanel" class="panel" hidden>
-    <form id="loginForm">
-        <table>
-            <tr>
-                <td colspan="2">
-                    <h2>관리자 로그인</h2>
-                </td>
-            </tr>
+    <!-- 로그인 및 회원가입 -->
+    <div id="authPanel" class="panel" hidden>
+        <h2 id="authTitle">로그인</h2>
 
-            <tr>
-                <td class="header">이메일</td>
-            </tr>
+        <form id="authForm">
+            <label for="email">이메일</label>
+            <input
+                type="email"
+                id="email"
+                autocomplete="username"
+                required
+            >
 
-            <tr>
-                <td>
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="관리자 이메일"
-                        autocomplete="username"
-                        required
-                    >
-                </td>
-            </tr>
+            <label for="password">비밀번호</label>
+            <input
+                type="password"
+                id="password"
+                autocomplete="current-password"
+                minlength="8"
+                required
+            >
 
-            <tr>
-                <td class="header">비밀번호</td>
-            </tr>
+            <div class="center">
+                <button type="submit" id="authSubmit">로그인</button>
+                <button type="button" id="toggleAuth">회원가입</button>
+            </div>
+        </form>
 
-            <tr>
-                <td>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="비밀번호"
-                        autocomplete="current-password"
-                        required
-                    >
-                </td>
-            </tr>
+        <p id="authMessage" class="message" role="status"></p>
 
-            <tr>
-                <td style="padding-top: 15px;">
-                    <input type="submit" id="loginButton" value="로그인">
-                    <input
-                        type="button"
-                        value="취소"
-                        onclick="location.href='index.html'"
-                    >
-                </td>
-            </tr>
-        </table>
-    </form>
-
-    <p id="loginMessage" class="message" role="status"></p>
-</div>
-
-
-<!-- 관리자 권한이 없는 계정 -->
-<div id="deniedPanel" class="panel" hidden>
-    <h2>접근 권한 없음</h2>
-    <p>관리자 계정으로 로그인해야 합니다.</p>
-
-    <button type="button" id="logoutButton">
-        로그아웃
-    </button>
-
-    <button
-        type="button"
-        onclick="location.href='index.html'"
-    >
-        돌아가기
-    </button>
-</div>
-
-
-<!-- 글쓰기 화면 -->
-<div id="writePanel" hidden>
-
-    <div class="logout-area">
-        <span>관리자 로그인 상태</span>
-        <button type="button" id="writeLogoutButton">
-            로그아웃
-        </button>
+        <div class="center">
+            <button type="button" onclick="location.href='index.html'">
+                목록으로
+            </button>
+        </div>
     </div>
 
-    <form id="writeForm">
 
-        <table>
-            <tr>
-                <td colspan="2">
-                    <h2>글쓰기</h2>
-                </td>
-            </tr>
+    <!-- 이메일 인증 대기 -->
+    <div id="verifyPanel" class="panel" hidden>
+        <h2>이메일 인증 필요</h2>
 
-            <tr>
-                <td class="header">Title</td>
-            </tr>
+        <p>
+            가입한 이메일로 인증 링크를 보냈습니다.
+            메일함에서 인증을 완료한 뒤 아래 버튼을 눌러 주세요.
+        </p>
 
-            <tr>
-                <td>
-                    <input
-                        type="text"
-                        id="title"
-                        placeholder="제목을 입력하세요"
-                        maxlength="100"
-                        required
-                    >
-                </td>
-            </tr>
+        <p id="verifyEmail" class="message"></p>
 
-            <tr>
-                <td class="header">Author</td>
-            </tr>
+        <div class="center">
+            <button type="button" id="checkVerifyButton">
+                인증 확인
+            </button>
 
-            <tr>
-                <td>
-                    <input
-                        type="text"
-                        id="author"
-                        placeholder="작성자 이름을 입력하세요"
-                        maxlength="30"
-                        required
-                    >
-                </td>
-            </tr>
+            <button type="button" id="resendButton">
+                인증 메일 재전송
+            </button>
 
-            <tr>
-                <td class="header">Comment</td>
-            </tr>
+            <button type="button" id="verifyLogoutButton">
+                로그아웃
+            </button>
+        </div>
 
-            <tr>
-                <td>
-                    <textarea
-                        id="detail"
-                        placeholder="내용을 입력하세요"
-                        maxlength="5000"
-                        required
-                    ></textarea>
-                </td>
-            </tr>
+        <p id="verifyMessage" class="message" role="status"></p>
+    </div>
 
-            <tr>
-                <td style="padding-top: 15px;">
-                    <input
-                        type="submit"
-                        id="submitButton"
-                        value="등록"
-                    >
 
-                    <input
-                        type="button"
-                        value="취소"
-                        onclick="location.href='index.html'"
-                    >
-                </td>
-            </tr>
-        </table>
+    <!-- 글쓰기 -->
+    <div id="writePanel" hidden>
 
-    </form>
+        <div class="panel center">
+            <span>로그인 및 이메일 인증 완료</span>
+            <button type="button" id="logoutButton">
+                로그아웃
+            </button>
+        </div>
 
-    <p id="writeMessage" class="message" role="status"></p>
+        <form id="writeForm">
+            <table>
+                <tr>
+                    <td colspan="2"><h2>글쓰기</h2></td>
+                </tr>
 
-</div>
+                <tr><td><strong>Title</strong></td></tr>
+                <tr>
+                    <td>
+                        <input
+                            type="text"
+                            id="title"
+                            placeholder="제목을 입력하세요"
+                            maxlength="100"
+                            required
+                        >
+                    </td>
+                </tr>
+
+                <tr><td><strong>Author</strong></td></tr>
+                <tr>
+                    <td>
+                        <input
+                            type="text"
+                            id="author"
+                            placeholder="작성자 이름을 입력하세요"
+                            maxlength="30"
+                            required
+                        >
+                    </td>
+                </tr>
+
+                <tr><td><strong>Comment</strong></td></tr>
+                <tr>
+                    <td>
+                        <textarea
+                            id="detail"
+                            placeholder="내용을 입력하세요"
+                            maxlength="5000"
+                            required
+                        ></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="center">
+                        <input type="submit" id="submitButton" value="등록">
+
+                        <button
+                            type="button"
+                            onclick="location.href='index.html'"
+                        >
+                            취소
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+        <p id="writeMessage" class="message" role="status"></p>
+    </div>
 
 
 <script type="module">
@@ -290,9 +236,12 @@
 
     import {
         getAuth,
+        createUserWithEmailAndPassword,
         signInWithEmailAndPassword,
+        sendEmailVerification,
         onAuthStateChanged,
-        signOut
+        signOut,
+        reload
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     import {
@@ -302,12 +251,9 @@
         serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    import {
-        firebaseConfig
-    } from "./firebase-config.js";
+    import { firebaseConfig } from "./firebase-config.js";
 
 
-    // Firebase 초기화
     const app = getApps().length > 0
         ? getApp()
         : initializeApp(firebaseConfig);
@@ -316,88 +262,261 @@
     const db = getFirestore(app);
 
 
-    // 관리자 UID
-    const ADMIN_UID = "nFEHK0hHcngxC6kEiXVywxFiYPr2";
-
-
-    // 화면 요소
-    const loginPanel = document.getElementById("loginPanel");
-    const deniedPanel = document.getElementById("deniedPanel");
+    const authPanel = document.getElementById("authPanel");
+    const verifyPanel = document.getElementById("verifyPanel");
     const writePanel = document.getElementById("writePanel");
 
-    const loginForm = document.getElementById("loginForm");
+    const authForm = document.getElementById("authForm");
     const writeForm = document.getElementById("writeForm");
 
-    const loginMessage = document.getElementById("loginMessage");
+    const authTitle = document.getElementById("authTitle");
+    const authSubmit = document.getElementById("authSubmit");
+    const toggleAuth = document.getElementById("toggleAuth");
+
+    const authMessage = document.getElementById("authMessage");
+    const verifyMessage = document.getElementById("verifyMessage");
     const writeMessage = document.getElementById("writeMessage");
 
-    const loginButton = document.getElementById("loginButton");
+    const verifyEmail = document.getElementById("verifyEmail");
+    const checkVerifyButton = document.getElementById("checkVerifyButton");
+    const resendButton = document.getElementById("resendButton");
     const submitButton = document.getElementById("submitButton");
 
+    let isSignupMode = false;
 
-    // 로그인 상태에 따른 화면 표시
-    onAuthStateChanged(auth, (user) => {
 
-        loginPanel.hidden = true;
-        deniedPanel.hidden = true;
+    function showPanel(panel) {
+        authPanel.hidden = true;
+        verifyPanel.hidden = true;
         writePanel.hidden = true;
 
+        panel.hidden = false;
+    }
+
+
+    async function updateScreen(user) {
+
         if (!user) {
-            loginPanel.hidden = false;
+            showPanel(authPanel);
             return;
         }
 
-        if (user.uid === ADMIN_UID) {
-            writePanel.hidden = false;
-        } else {
-            deniedPanel.hidden = false;
-        }
+        try {
+            await reload(user);
+            await user.getIdToken(true);
 
+            if (!user.emailVerified) {
+                showPanel(verifyPanel);
+                verifyEmail.textContent = user.email || "";
+                return;
+            }
+
+            showPanel(writePanel);
+
+        } catch (error) {
+            console.error("인증 상태 확인 실패:", error);
+            showPanel(authPanel);
+
+            authMessage.textContent =
+                "계정 상태를 확인하지 못했습니다. 다시 로그인해 주세요.";
+        }
+    }
+
+
+    onAuthStateChanged(auth, (user) => {
+        updateScreen(user);
     });
 
 
-    // 로그인 처리
-    loginForm.addEventListener("submit", async (e) => {
+    // 로그인 / 회원가입 모드 전환
+    toggleAuth.addEventListener("click", () => {
+
+        isSignupMode = !isSignupMode;
+
+        authTitle.textContent = isSignupMode
+            ? "회원가입"
+            : "로그인";
+
+        authSubmit.textContent = isSignupMode
+            ? "가입하기"
+            : "로그인";
+
+        toggleAuth.textContent = isSignupMode
+            ? "로그인으로 돌아가기"
+            : "회원가입";
+
+        authMessage.textContent = "";
+        authForm.reset();
+    });
+
+
+    // 로그인 및 회원가입
+    authForm.addEventListener("submit", async (e) => {
 
         e.preventDefault();
 
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
 
-        loginButton.disabled = true;
-        loginMessage.textContent = "로그인 확인 중...";
-        loginMessage.className = "message";
+        authSubmit.disabled = true;
+        toggleAuth.disabled = true;
+
+        authMessage.textContent = "처리 중...";
+        authMessage.className = "message";
 
         try {
 
-            const credential = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
+            if (isSignupMode) {
 
-            if (credential.user.uid !== ADMIN_UID) {
+                if (password.length < 8) {
+                    throw new Error("비밀번호는 8자 이상이어야 합니다.");
+                }
 
-                await signOut(auth);
+                const credential = await createUserWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
 
-                loginMessage.textContent =
-                    "관리자 권한이 없는 계정입니다.";
+                await sendEmailVerification(credential.user);
 
-                loginMessage.className = "message error";
+                showPanel(verifyPanel);
+                verifyEmail.textContent = email;
+
+                verifyMessage.textContent =
+                    "회원가입 완료! 인증 메일을 확인해 주세요.";
+
+                verifyMessage.className = "message success";
+
+            } else {
+
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+                await updateScreen(auth.currentUser);
+
             }
 
         } catch (error) {
 
-            console.error("로그인 실패:", error);
+            console.error("인증 처리 실패:", error);
 
-            loginMessage.textContent =
-                "로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.";
+            const messages = {
+                "auth/email-already-in-use": "이미 가입된 이메일입니다.",
+                "auth/invalid-email": "이메일 형식이 올바르지 않습니다.",
+                "auth/weak-password": "비밀번호가 너무 약합니다.",
+                "auth/invalid-credential": "이메일 또는 비밀번호가 올바르지 않습니다.",
+                "auth/network-request-failed": "네트워크 연결을 확인해 주세요."
+            };
 
-            loginMessage.className = "message error";
+            authMessage.textContent =
+                error.message.startsWith("비밀번호")
+                    ? error.message
+                    : messages[error.code] || "요청을 처리하지 못했습니다.";
+
+            authMessage.className = "message error";
 
         } finally {
 
-            loginButton.disabled = false;
+            authSubmit.disabled = false;
+            toggleAuth.disabled = false;
+
+        }
+
+    });
+
+
+    // 이메일 인증 확인
+    checkVerifyButton.addEventListener("click", async () => {
+
+        const user = auth.currentUser;
+
+        if (!user) {
+            showPanel(authPanel);
+            return;
+        }
+
+        checkVerifyButton.disabled = true;
+        verifyMessage.textContent = "인증 상태 확인 중...";
+
+        try {
+
+            await reload(user);
+            await user.getIdToken(true);
+
+            if (user.emailVerified) {
+
+                verifyMessage.textContent = "이메일 인증 완료!";
+                verifyMessage.className = "message success";
+
+                await updateScreen(user);
+
+            } else {
+
+                verifyMessage.textContent =
+                    "아직 인증되지 않았습니다. 이메일의 인증 링크를 눌러 주세요.";
+
+                verifyMessage.className = "message error";
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+            verifyMessage.textContent = "인증 상태 확인에 실패했습니다.";
+
+        } finally {
+
+            checkVerifyButton.disabled = false;
+
+        }
+
+    });
+
+
+    // 인증 메일 재전송
+    resendButton.addEventListener("click", async () => {
+
+        const user = auth.currentUser;
+
+        if (!user) {
+            showPanel(authPanel);
+            return;
+        }
+
+        resendButton.disabled = true;
+
+        try {
+
+            await reload(user);
+
+            if (user.emailVerified) {
+                await updateScreen(user);
+                return;
+            }
+
+            await sendEmailVerification(user);
+
+            verifyMessage.textContent =
+                "인증 메일을 다시 보냈습니다. 이메일을 확인해 주세요.";
+
+            verifyMessage.className = "message success";
+
+        } catch (error) {
+
+            console.error(error);
+
+            verifyMessage.textContent =
+                "메일 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+
+            verifyMessage.className = "message error";
+
+        } finally {
+
+            resendButton.disabled = false;
 
         }
 
@@ -408,15 +527,12 @@
     async function logout() {
 
         try {
-
             await signOut(auth);
             location.href = "index.html";
 
         } catch (error) {
-
-            console.error("로그아웃 실패:", error);
+            console.error(error);
             alert("로그아웃에 실패했습니다.");
-
         }
 
     }
@@ -424,11 +540,10 @@
     document.getElementById("logoutButton")
         .addEventListener("click", logout);
 
-    document.getElementById("writeLogoutButton")
+    document.getElementById("verifyLogoutButton")
         .addEventListener("click", logout);
 
 
-    // 날짜 생성
     function getTodayString() {
 
         const today = new Date();
@@ -442,66 +557,71 @@
     }
 
 
-    // 게시글 등록
+    // 게시글 작성
     writeForm.addEventListener("submit", async (e) => {
 
         e.preventDefault();
 
         const user = auth.currentUser;
 
-        // 관리자 UID 재확인
-        if (!user || user.uid !== ADMIN_UID) {
-
-            alert("관리자만 게시글을 작성할 수 있습니다.");
+        if (!user) {
+            alert("로그인이 필요합니다.");
+            showPanel(authPanel);
             return;
-
-        }
-
-        const title = document.getElementById("title").value.trim();
-        const author = document.getElementById("author").value.trim();
-        const detail = document.getElementById("detail").value.trim();
-
-        // 입력값 검사
-        if (!title || !author || !detail) {
-
-            alert("모든 항목을 입력해 주세요.");
-            return;
-
-        }
-
-        if (title.length > 100 || author.length > 30 || detail.length > 5000) {
-
-            alert("입력 가능한 글자 수를 초과했습니다.");
-            return;
-
         }
 
         submitButton.disabled = true;
-        writeMessage.textContent = "게시글 저장 중...";
-        writeMessage.className = "message";
 
         try {
 
-            await addDoc(collection(db, "posts"), {
+            await reload(user);
+            await user.getIdToken(true);
 
+            if (!user.emailVerified) {
+                alert("이메일 인증을 완료해야 글을 작성할 수 있습니다.");
+                showPanel(verifyPanel);
+                return;
+            }
+
+            const title = document.getElementById("title").value.trim();
+            const author = document.getElementById("author").value.trim();
+            const detail = document.getElementById("detail").value.trim();
+
+            if (!title || !author || !detail) {
+                alert("모든 항목을 입력해 주세요.");
+                return;
+            }
+
+            if (
+                title.length > 100 ||
+                author.length > 30 ||
+                detail.length > 5000
+            ) {
+                alert("입력 가능한 글자 수를 초과했습니다.");
+                return;
+            }
+
+            writeMessage.textContent = "게시글 저장 중...";
+            writeMessage.className = "message";
+
+            await addDoc(collection(db, "posts"), {
                 title: title,
                 author: author,
                 detail: detail,
                 date: getTodayString(),
-                createdAt: serverTimestamp()
-
+                createdAt: serverTimestamp(),
+                uid: user.uid
             });
 
-            alert("작성 완료!");
-
+            alert("게시글이 등록되었습니다.");
             location.href = "index.html";
 
         } catch (error) {
 
-            console.error("글 저장 실패:", error);
+            console.error("게시글 저장 실패:", error);
 
             writeMessage.textContent =
-                "글 저장에 실패했습니다. Firebase 권한 설정을 확인하세요.";
+                "게시글 등록에 실패했습니다. 로그인 상태와 Firebase 규칙을 확인해 주세요.";
 
             writeMessage.className = "message error";
 
