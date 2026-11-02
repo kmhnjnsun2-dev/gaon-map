@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -34,7 +35,7 @@
         <div class="fixed-room toilet"><div>화장실</div></div>
         <div class="fixed-room left-stair"><div>좌측<br>계단</div></div>
         <div class="fixed-room lobby"><div>로비</div></div>
-            
+
         <div class="fixed-room central-corridor"><div>중앙복도</div></div>
         <div class="fixed-room left-corridor"><div>좌측복도</div></div>
         <div class="fixed-room robot-room"><div>로봇중점교실</div></div>
@@ -52,8 +53,8 @@
         <div class="fixed-room right-toilet"><div>우측<br>화장실</div></div>
         <div class="fixed-room right-stair"><div>우측<br>계단</div></div>
         <div class="fixed-room cafe"><div>카페</div></div>
-    
-        <div class="outdoor-class">    
+
+        <div class="outdoor-class">
             <div class="fixed-room playground"><div>운동장</div></div>
             <div class="fixed-room minerva"><div>미네<br>르바</div></div>
             <div class="fixed-room mongjakso"><div>몽작소</div></div>
@@ -88,7 +89,6 @@
         <div class="class-room class303">3-3</div>
         <div class="class-room class304">3-4</div>
         <div class="class-room class305">3-5</div>
-
     </div>
 
     <!-- 3층 지도 -->
@@ -114,7 +114,6 @@
         <div class="fixed-room thirdfloor-science-room3"><div>과학탐구실험3실</div></div>
         <div class="fixed-room thirdfloor-preparing-room"><div>준비실</div></div>
 
-        
         <div class="class-room class101">1-3</div>
         <div class="class-room class102">1-2</div>
         <div class="class-room class103">1-1</div>
@@ -153,54 +152,132 @@
 
     <!-- Firebase 데이터베이스 연동 스크립트 -->
     <script type="module">
-        import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import {
+            getApp,
+            getApps,
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            query,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
         import { firebaseConfig } from "./firebase-config.js";
 
-        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+        const app = getApps().length > 0
+            ? getApp()
+            : initializeApp(firebaseConfig);
+
         const db = getFirestore(app);
 
         async function loadBoard() {
-            const boardBody = document.getElementById('boardBody');
+            const boardBody = document.getElementById("boardBody");
+
             if (!boardBody) return;
-            boardBody.innerHTML = '';
+
+            // 기존 게시판 내용 제거
+            boardBody.replaceChildren();
 
             try {
-                const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+                const q = query(
+                    collection(db, "posts"),
+                    orderBy("createdAt", "desc")
+                );
+
                 const querySnapshot = await getDocs(q);
 
+                // 게시글이 없는 경우
                 if (querySnapshot.empty) {
-                    boardBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 15px;">등록된 게시물이 없습니다.</td></tr>`;
+                    const row = document.createElement("tr");
+                    const cell = document.createElement("td");
+
+                    cell.colSpan = 4;
+                    cell.style.textAlign = "center";
+                    cell.style.padding = "15px";
+                    cell.textContent = "등록된 게시물이 없습니다.";
+
+                    row.appendChild(cell);
+                    boardBody.appendChild(row);
+
                     return;
                 }
 
-                let totalCount = querySnapshot.size;
+                const totalCount = querySnapshot.size;
                 let index = 0;
 
                 querySnapshot.forEach((doc) => {
                     const post = doc.data();
-                    const row = document.createElement('tr');
-                    row.className = 'body';
-                    row.innerHTML = `
-                        <td class="num">${totalCount - index}</td>
-                        <td class="board-title"><a href="detail.html?id=${doc.id}">${post.title}</a></td>
-                        <td class="author">${post.author}</td>
-                        <td class="date">${post.date}</td>
-                    `;
+
+                    const row = document.createElement("tr");
+                    row.className = "body";
+
+                    // 번호
+                    const numberCell = document.createElement("td");
+                    numberCell.className = "num";
+                    numberCell.textContent = String(totalCount - index);
+
+                    // 제목
+                    const titleCell = document.createElement("td");
+                    titleCell.className = "board-title";
+
+                    const titleLink = document.createElement("a");
+                    titleLink.textContent = String(post.title ?? "");
+                    titleLink.href =
+                        "detail.html?id=" + encodeURIComponent(doc.id);
+
+                    titleCell.appendChild(titleLink);
+
+                    // 작성자
+                    const authorCell = document.createElement("td");
+                    authorCell.className = "author";
+                    authorCell.textContent = String(post.author ?? "");
+
+                    // 작성 날짜
+                    const dateCell = document.createElement("td");
+                    dateCell.className = "date";
+                    dateCell.textContent = String(post.date ?? "");
+
+                    // 게시글 행에 셀 추가
+                    row.append(
+                        numberCell,
+                        titleCell,
+                        authorCell,
+                        dateCell
+                    );
+
                     boardBody.appendChild(row);
+
                     index++;
                 });
+
             } catch (error) {
                 console.error("데이터 불러오기 실패:", error);
+
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+
+                cell.colSpan = 4;
+                cell.style.textAlign = "center";
+                cell.style.padding = "15px";
+                cell.textContent = "게시물을 불러오지 못했습니다.";
+
+                row.appendChild(cell);
+                boardBody.appendChild(row);
             }
         }
 
         window.onload = function() {
-            if (typeof showFloor === 'function') {
+            if (typeof showFloor === "function") {
                 showFloor(1);
             }
+
             loadBoard();
         };
     </script>
+
 </body>
 </html>
