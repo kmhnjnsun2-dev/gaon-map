@@ -11,13 +11,11 @@
 
 <body>
 
-    <!-- 제목 -->
     <div class="title">
         <h1>2026 가온고 교실 배치도</h1>
         <hr>
     </div>
 
-    <!-- 층 선택 -->
     <div class="floor-buttons">
         <button onclick="showFloor(1)">1층</button>
         <button onclick="showFloor(2)">2층</button>
@@ -35,7 +33,6 @@
         <div class="fixed-room toilet"><div>화장실</div></div>
         <div class="fixed-room left-stair"><div>좌측<br>계단</div></div>
         <div class="fixed-room lobby"><div>로비</div></div>
-
         <div class="fixed-room central-corridor"><div>중앙복도</div></div>
         <div class="fixed-room left-corridor"><div>좌측복도</div></div>
         <div class="fixed-room robot-room"><div>로봇중점교실</div></div>
@@ -45,7 +42,6 @@
         <div class="fixed-room bio-education-room"><div>환경교육부</div></div>
         <div class="fixed-room overnight-room"><div>숙직실</div></div>
         <div class="fixed-room printing-room"><div>인쇄실</div></div>
-
         <div class="fixed-room administration-office"><div>행정실</div></div>
         <div class="fixed-room chairman-office"><div>이사장실</div></div>
         <div class="fixed-room substation-room"><div>변전실</div></div>
@@ -83,7 +79,6 @@
         <div class="class-room class105">1-5</div>
         <div class="class-room class107">1-7</div>
         <div class="class-room class108">1-8</div>
-
         <div class="class-room class301">3-1</div>
         <div class="class-room class302">3-2</div>
         <div class="class-room class303">3-3</div>
@@ -118,7 +113,6 @@
         <div class="class-room class102">1-2</div>
         <div class="class-room class103">1-1</div>
         <div class="class-room class104">1-4</div>
-
         <div class="class-room class207">2-7</div>
         <div class="class-room class208">2-8</div>
     </div>
@@ -126,12 +120,12 @@
     <!-- 4층 지도 -->
     <div class="map floor4"></div>
 
-    <!-- 기존 지도 동작 스크립트 -->
     <script src="map.js"></script>
 
-    <!-- 게시판 영역 -->
+    <!-- 게시판 -->
     <div class="board-container">
         <h2>게시판</h2>
+
         <table class="table" id="boardTable">
             <thead>
                 <tr class="header">
@@ -141,8 +135,7 @@
                     <th class="date">작성날짜</th>
                 </tr>
             </thead>
-            <tbody id="boardBody">
-            </tbody>
+            <tbody id="boardBody"></tbody>
         </table>
 
         <div class="button-area">
@@ -150,7 +143,6 @@
         </div>
     </div>
 
-    <!-- Firebase 데이터베이스 연동 스크립트 -->
     <script type="module">
         import {
             getApp,
@@ -179,7 +171,6 @@
 
             if (!boardBody) return;
 
-            // 기존 게시판 내용 제거
             boardBody.replaceChildren();
 
             try {
@@ -190,7 +181,6 @@
 
                 const querySnapshot = await getDocs(q);
 
-                // 게시글이 없는 경우
                 if (querySnapshot.empty) {
                     const row = document.createElement("tr");
                     const cell = document.createElement("td");
@@ -202,46 +192,39 @@
 
                     row.appendChild(cell);
                     boardBody.appendChild(row);
-
                     return;
                 }
 
                 const totalCount = querySnapshot.size;
-                let index = 0;
 
-                querySnapshot.forEach((doc) => {
-                    const post = doc.data();
+                querySnapshot.forEach((postDoc, index) => {
+                    const post = postDoc.data();
 
                     const row = document.createElement("tr");
                     row.className = "body";
 
-                    // 번호
                     const numberCell = document.createElement("td");
                     numberCell.className = "num";
                     numberCell.textContent = String(totalCount - index);
 
-                    // 제목
                     const titleCell = document.createElement("td");
                     titleCell.className = "board-title";
 
                     const titleLink = document.createElement("a");
                     titleLink.textContent = String(post.title ?? "");
                     titleLink.href =
-                        "detail.html?id=" + encodeURIComponent(doc.id);
+                        "detail.html?id=" + encodeURIComponent(postDoc.id);
 
                     titleCell.appendChild(titleLink);
 
-                    // 작성자
                     const authorCell = document.createElement("td");
                     authorCell.className = "author";
                     authorCell.textContent = String(post.author ?? "");
 
-                    // 작성 날짜
                     const dateCell = document.createElement("td");
                     dateCell.className = "date";
                     dateCell.textContent = String(post.date ?? "");
 
-                    // 게시글 행에 셀 추가
                     row.append(
                         numberCell,
                         titleCell,
@@ -250,33 +233,30 @@
                     );
 
                     boardBody.appendChild(row);
-
-                    index++;
                 });
 
             } catch (error) {
-                console.error("데이터 불러오기 실패:", error);
+                console.error("게시판 데이터 불러오기 실패:", error);
 
                 const row = document.createElement("tr");
                 const cell = document.createElement("td");
 
                 cell.colSpan = 4;
                 cell.style.textAlign = "center";
-                cell.style.padding = "15px";
-                cell.textContent = "게시물을 불러오지 못했습니다.";
+                cell.textContent = "게시글을 불러오지 못했습니다.";
 
                 row.appendChild(cell);
                 boardBody.appendChild(row);
             }
         }
 
-        window.onload = function() {
+        window.addEventListener("load", () => {
             if (typeof showFloor === "function") {
                 showFloor(1);
             }
 
             loadBoard();
-        };
+        });
     </script>
 
 </body>
